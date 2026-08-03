@@ -5,6 +5,8 @@ import 'package:projet_track_expense/domain/entities/category.dart';
 import 'package:projet_track_expense/presentation/providers/transaction_provider.dart';
 import 'package:projet_track_expense/presentation/providers/category_provider.dart';
 import 'package:projet_track_expense/core/constants/app_colors.dart';
+import 'package:projet_track_expense/core/constants/app_config.dart';
+import 'package:projet_track_expense/core/styles/app_styles.dart';
 import 'package:intl/intl.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
@@ -62,7 +64,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   void _openCategoryPicker() {
-    // On stocke le type actuel pour le passer au Consumer
     final currentType = _selectedType;
 
     showModalBottomSheet(
@@ -71,11 +72,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      // ✅ SOLUTION DU 1ER COUP : On utilise un Consumer à l'intérieur
       builder: (BuildContext sheetContext) {
         return Consumer(
           builder: (context, ref, child) {
-            // On lit le provider ici. Si le chargement dure 0.5s, le Consumer va se mettre à jour.
             final categoryAsyncValue = currentType == TransactionType.expense
                 ? ref.watch(expenseCategoryListProvider)
                 : ref.watch(incomeCategoryListProvider);
@@ -136,47 +135,128 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Ajouter une transaction'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        elevation: 0,
+        foregroundColor: Colors.white,
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Type de transaction
-                SegmentedButton<TransactionType>(
-                  segments: const [
-                    ButtonSegment(
-                      value: TransactionType.expense,
-                      label: Text('Dépense'),
-                      icon: Icon(Icons.arrow_downward),
-                    ),
-                    ButtonSegment(
-                      value: TransactionType.income,
-                      label: Text('Revenu'),
-                      icon: Icon(Icons.arrow_upward),
-                    ),
-                  ],
-                  selected: {_selectedType},
-                  onSelectionChanged: (Set<TransactionType> newSelection) {
-                    setState(() {
-                      _selectedType = newSelection.first;
-                      _selectedCategory = null;
-                    });
-                  },
+                // 🟢 REMPLACEMENT DU SEGMENTED BUTTON PAR UN BEAU SÉLECTEUR PERSONNALISÉ
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedType = TransactionType.expense;
+                              _selectedCategory = null;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color: _selectedType == TransactionType.expense
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.arrow_downward,
+                                  color: _selectedType == TransactionType.expense
+                                      ? Colors.white
+                                      : Colors.grey.shade600,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Dépense',
+                                  style: TextStyle(
+                                    color: _selectedType == TransactionType.expense
+                                        ? Colors.white
+                                        : Colors.grey.shade600,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedType = TransactionType.income;
+                              _selectedCategory = null;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color: _selectedType == TransactionType.income
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.arrow_upward,
+                                  color: _selectedType == TransactionType.income
+                                      ? Colors.white
+                                      : Colors.grey.shade600,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Revenu',
+                                  style: TextStyle(
+                                    color: _selectedType == TransactionType.income
+                                        ? Colors.white
+                                        : Colors.grey.shade600,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // Montant
                 TextFormField(
                   controller: _amountController,
-                  decoration: const InputDecoration(
-                    labelText: 'Montant (€)',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.euro),
-                  ),
+                  decoration: AppStyles.inputDecoration('Montant (${AppConfig.currencySymbol})'),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Veuillez saisir un montant';
@@ -192,11 +272,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 // Description
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.description),
-                  ),
+                  decoration: AppStyles.inputDecoration('Description'),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Veuillez saisir une description';
@@ -223,11 +299,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     }
                   },
                   child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Date',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.calendar_today),
-                    ),
+                    decoration: AppStyles.inputDecoration('Date'),
                     child: Text(
                       DateFormat('dd/MM/yyyy').format(_selectedDate),
                     ),
@@ -239,12 +311,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 InkWell(
                   onTap: _openCategoryPicker,
                   child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Catégorie',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.category),
-                      suffixIcon: Icon(Icons.arrow_drop_down),
-                    ),
+                    decoration: AppStyles.inputDecoration('Catégorie'),
                     child: _selectedCategory != null
                         ? Row(
                             children: [
@@ -259,18 +326,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                         : const Text('Sélectionnez une catégorie...'),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 50,
+                  height: 56,
                   child: ElevatedButton(
                     onPressed: _saveTransaction,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Enregistrer'),
+                    style: AppStyles.primaryButton,
+                    child: const Text('Enregistrer', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                 ),
                 const SizedBox(height: 40),

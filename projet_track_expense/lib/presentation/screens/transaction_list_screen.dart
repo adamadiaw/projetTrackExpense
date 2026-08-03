@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:projet_track_expense/domain/entities/transaction.dart';
 import 'package:projet_track_expense/presentation/providers/transaction_provider.dart';
+import 'package:projet_track_expense/core/constants/app_colors.dart';
+import 'package:projet_track_expense/core/constants/app_config.dart'; // 👈 AJOUT
+// import 'package:projet_track_expense/core/styles/app_styles.dart';
 import 'package:intl/intl.dart';
 
 class TransactionListScreen extends ConsumerWidget {
@@ -14,6 +17,17 @@ class TransactionListScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Toutes les transactions'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        elevation: 0,
+        foregroundColor: Colors.white,
       ),
       body: transactionAsync.when(
         data: (transactions) {
@@ -23,23 +37,38 @@ class TransactionListScreen extends ConsumerWidget {
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: transactions.length,
-            separatorBuilder: (_, __) => const Divider(),
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final t = transactions[index];
               final color = t.type == TransactionType.expense ? Colors.red : Colors.green;
               final sign = t.type == TransactionType.expense ? '-' : '+';
-              final formatter = NumberFormat.currency(locale: 'fr_FR', symbol: '€', decimalDigits: 2);
+              final formatter = NumberFormat.currency(locale: 'fr_FR', symbol: AppConfig.currencySymbol, decimalDigits: 2); // 👈 MODIF
               
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: color.withValues(alpha: 0.1),
-                  child: Icon(t.type == TransactionType.expense ? Icons.arrow_downward : Icons.arrow_upward, color: color),
+              return Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                title: Text(t.description),
-                subtitle: Text(DateFormat('dd/MM/yyyy').format(t.date)),
-                trailing: Text(
-                  '$sign${formatter.format(t.amount)}',
-                  style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor: color.withValues(alpha: 0.1),
+                    child: Icon(t.type == TransactionType.expense ? Icons.arrow_downward : Icons.arrow_upward, color: color),
+                  ),
+                  title: Text(t.description, style: const TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: Text(DateFormat('dd/MM/yyyy').format(t.date), style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                  trailing: Text(
+                    '$sign${formatter.format(t.amount)}',
+                    style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                 ),
               );
             },
