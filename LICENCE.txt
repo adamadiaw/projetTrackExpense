@@ -1,0 +1,8 @@
+Copyright (c) 2026 Adama DIAW. Tous droits réservés.
+
+Il est strictement interdit de copier, modifier, altérer, fusionner, publier, 
+distribuer, sous-licencier et/ou vendre des copies de ce logiciel ou de ses 
+parties composantes sans l'autorisation écrite préalable et explicite de l'auteur.
+
+Le code est rendu public uniquement à des fins de consultation, d'apprentissage 
+et de contribution directe au repository d'origine via les outils de GitHub.
