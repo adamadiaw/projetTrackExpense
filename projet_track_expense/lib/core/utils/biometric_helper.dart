@@ -62,7 +62,7 @@ class BiometricHelper {
         localizedReason: reason,
         options: AuthenticationOptions(
           stickyAuth: stickyAuth,
-          biometricOnly: true, // On force uniquement la biométrie (pas de PIN système)
+          biometricOnly: true,
         ),
       );
 

@@ -1,5 +1,4 @@
 class AppConfig {
-  // C'est ici que tu définis ta monnaie. 
-  // Si un jour tu veux changer pour '€' ou '$', tu ne changes que cette ligne !
+  // C'est ici que tu définis la monnaie. 
   static const String currencySymbol = 'F';
 }

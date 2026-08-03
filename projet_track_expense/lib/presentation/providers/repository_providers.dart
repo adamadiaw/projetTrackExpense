@@ -3,7 +3,6 @@ import 'package:projet_track_expense/core/utils/encryption_helper.dart';
 import 'package:projet_track_expense/data/database/app_database.dart';
 // import 'package:projet_track_expense/data/database/app_database.dart';
 // import 'package:projet_track_expense/core/utils/encryption_helper.dart';
-// 👇 C'est ici que l'erreur se corrige. On importe le fichier exact où se trouve la classe.
 import 'package:projet_track_expense/data/repositories/impl/transaction_repository_impl.dart';
 import 'package:projet_track_expense/data/repositories/impl/category_repository_impl.dart';
 import 'package:projet_track_expense/domain/usecases/add_transaction_usecase.dart';

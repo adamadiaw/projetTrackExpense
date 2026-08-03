@@ -59,7 +59,6 @@ class TransactionRepositoryImpl implements TransactionRepository {
     return maps.map((map) => _mapToTransaction(map)).toList();
   }
 
-  // ✅ CORRECTION MAJEURE ICI : Mise à jour du budget après ajout de transaction
   @override
   Future<void> addTransaction(Transaction transaction) async {
     final map = _transactionToMap(transaction);

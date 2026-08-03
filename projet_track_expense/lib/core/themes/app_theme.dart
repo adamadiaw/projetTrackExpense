@@ -34,9 +34,6 @@ class AppTheme {
     scaffoldBackgroundColor: AppColors.background,
   );
 
-  // ==========================================
-  // THÈME SOMBRE (Construit en harmonie avec le tien)
-  // ==========================================
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     colorScheme: const ColorScheme.dark(

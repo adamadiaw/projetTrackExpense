@@ -68,6 +68,7 @@ class AppDatabase {
   // ==========================================
   // REQUÊTES CRUD (CATÉGORIES)
   // ==========================================
+  
   Future<List<Map<String, dynamic>>> getAllCategories() async {
     final db = await database;
     return await db.query('categories');
@@ -91,6 +92,7 @@ class AppDatabase {
   // ==========================================
   // REQUÊTES CRUD (TRANSACTIONS)
   // ==========================================
+
   Future<List<Map<String, dynamic>>> getAllTransactions() async {
     final db = await database;
     return await db.query('transactions', orderBy: 'date DESC');
@@ -128,6 +130,7 @@ class AppDatabase {
   // ==========================================
   // STATISTIQUES FINANCIÈRES
   // ==========================================
+
   Future<double> getTotalIncome(String start, String end) async {
     final db = await database;
     final result = await db.rawQuery('''
@@ -151,6 +154,7 @@ class AppDatabase {
   // ==========================================
   // REQUÊTES CRUD (BUDGETS)
   // ==========================================
+
   Future<List<Map<String, dynamic>>> getAllBudgets() async {
     final db = await database;
     return await db.query('budgets');
@@ -161,7 +165,7 @@ class AppDatabase {
     return await db.insert('budgets', data);
   }
 
-  // 🔥 NOUVELLE MÉTHODE AJOUTÉE POUR METTRE À JOUR LE SPENT
+  // MÉTHODE AJOUTÉE POUR METTRE À JOUR LE SPENT
   Future<void> updateBudgetSpentByCategory(int categoryId, double newTotalSpent) async {
     final db = await database;
     await db.update(

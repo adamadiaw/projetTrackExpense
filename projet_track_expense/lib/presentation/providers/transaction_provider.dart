@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:projet_track_expense/domain/entities/transaction.dart';
 // import 'package:projet_track_expense/domain/usecases/add_transaction_usecase.dart';
 import 'package:projet_track_expense/presentation/providers/repository_providers.dart';
-import 'package:projet_track_expense/presentation/providers/budget_provider.dart'; // 🔥 IMPORT CRUCIAL AJOUTÉ
+import 'package:projet_track_expense/presentation/providers/budget_provider.dart'; 
 
 // 1. Provider pour charger la liste des transactions (FutureProvider)
 final transactionListProvider = FutureProvider<List<Transaction>>((ref) async {
@@ -42,8 +42,6 @@ class TransactionNotifier extends Notifier<List<Transaction>> {
       // Invalidation des caches pour forcer le rafraîchissement de l'UI
       ref.invalidate(transactionListProvider); 
       ref.invalidate(balanceProvider);
-      
-      // 🔥 LA LIGNE QUI MANQUAIT POUR LE BUDGET
       ref.invalidate(budgetListProvider);
       
       // Mise à jour de l'état interne
