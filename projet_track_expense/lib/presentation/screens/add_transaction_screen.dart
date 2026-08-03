@@ -156,12 +156,12 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 🟢 REMPLACEMENT DU SEGMENTED BUTTON PAR UN BEAU SÉLECTEUR PERSONNALISÉ
+                // Sélecteur de type personnalisé
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: Colors.grey.shade300),
+                    border: Border.all(color: Theme.of(context).dividerColor),
                   ),
                   padding: const EdgeInsets.all(4),
                   child: Row(
@@ -189,7 +189,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                   Icons.arrow_downward,
                                   color: _selectedType == TransactionType.expense
                                       ? Colors.white
-                                      : Colors.grey.shade600,
+                                      : Theme.of(context).iconTheme.color,
                                   size: 18,
                                 ),
                                 const SizedBox(width: 8),
@@ -198,7 +198,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                   style: TextStyle(
                                     color: _selectedType == TransactionType.expense
                                         ? Colors.white
-                                        : Colors.grey.shade600,
+                                        : Theme.of(context).textTheme.bodyMedium?.color,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -230,7 +230,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                   Icons.arrow_upward,
                                   color: _selectedType == TransactionType.income
                                       ? Colors.white
-                                      : Colors.grey.shade600,
+                                      : Theme.of(context).iconTheme.color,
                                   size: 18,
                                 ),
                                 const SizedBox(width: 8),
@@ -239,7 +239,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                   style: TextStyle(
                                     color: _selectedType == TransactionType.income
                                         ? Colors.white
-                                        : Colors.grey.shade600,
+                                        : Theme.of(context).textTheme.bodyMedium?.color,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -256,7 +256,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 // Montant
                 TextFormField(
                   controller: _amountController,
-                  decoration: AppStyles.inputDecoration('Montant (${AppConfig.currencySymbol})'),
+                  decoration: AppStyles.inputDecoration(context, 'Montant (${AppConfig.currencySymbol})'),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Veuillez saisir un montant';
@@ -272,7 +272,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 // Description
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: AppStyles.inputDecoration('Description'),
+                  decoration: AppStyles.inputDecoration(context, 'Description'),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Veuillez saisir une description';
@@ -299,7 +299,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     }
                   },
                   child: InputDecorator(
-                    decoration: AppStyles.inputDecoration('Date'),
+                    decoration: AppStyles.inputDecoration(context, 'Date'),
                     child: Text(
                       DateFormat('dd/MM/yyyy').format(_selectedDate),
                     ),
@@ -311,7 +311,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 InkWell(
                   onTap: _openCategoryPicker,
                   child: InputDecorator(
-                    decoration: AppStyles.inputDecoration('Catégorie'),
+                    decoration: AppStyles.inputDecoration(context, 'Catégorie'),
                     child: _selectedCategory != null
                         ? Row(
                             children: [

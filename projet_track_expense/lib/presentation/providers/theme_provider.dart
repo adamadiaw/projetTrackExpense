@@ -3,19 +3,18 @@ import 'package:flutter_riverpod/legacy.dart';
 
 // StateNotifier pour gérer le thème
 class ThemeNotifier extends StateNotifier<ThemeMode> {
-  ThemeNotifier() : super(ThemeMode.system);
+  ThemeNotifier() : super(ThemeMode.light); // On démarre en mode clair par défaut
 
   void setTheme(ThemeMode themeMode) {
     state = themeMode;
   }
 
+  // ALTERNANCE DIRECTE : Light -> Dark -> Light
   void toggleTheme() {
-    if (state == ThemeMode.system) {
-      state = ThemeMode.light;
-    } else if (state == ThemeMode.light) {
+    if (state == ThemeMode.light) {
       state = ThemeMode.dark;
     } else {
-      state = ThemeMode.system;
+      state = ThemeMode.light;
     }
   }
 }

@@ -34,34 +34,48 @@ class AppStyles {
   );
 
   // --- CARTES ET OMBRES ---
-  static BoxDecoration cardDecoration = BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(20),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.05),
-        blurRadius: 15,
-        offset: const Offset(0, 5),
-      ),
-    ],
-  );
+  static BoxDecoration cardDecoration(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return BoxDecoration(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: isDark
+          ? [] // Pas d'ombre en mode sombre
+          : [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
+    );
+  }
 
-  // --- CHAMPS DE SAISIE (Inputs) ---
-  static InputDecoration inputDecoration(String label) {
+  // --- CHAMPS DE SAISIE (Inputs) - ADAPTÉS AU THÈME ---
+  static InputDecoration inputDecoration(BuildContext context, String label) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade300;
+    final fillColor = isDark ? const Color(0xFF2C2C2C) : Colors.white; // Gris foncé la nuit, blanc le jour
+
     return InputDecoration(
       labelText: label,
       floatingLabelStyle: const TextStyle(color: AppColors.primary),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color.fromRGBO(224, 224, 224, 1)),
+        borderSide: BorderSide(color: borderColor),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: borderColor),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: AppColors.primary, width: 2),
       ),
       filled: true,
-      fillColor: Colors.grey.shade50,
+      fillColor: fillColor,
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      labelStyle: TextStyle(color: isDark ? Colors.grey.shade400 : AppColors.textHint),
     );
   }
 
