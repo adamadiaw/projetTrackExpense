@@ -4,6 +4,9 @@ import 'package:projet_track_expense/presentation/providers/category_provider.da
 import 'package:projet_track_expense/presentation/providers/budget_provider.dart';
 import 'package:projet_track_expense/domain/entities/category.dart';
 import 'package:projet_track_expense/domain/entities/budget.dart';
+import 'package:projet_track_expense/core/constants/app_colors.dart';
+import 'package:projet_track_expense/core/constants/app_config.dart'; // 👈 AJOUT
+import 'package:projet_track_expense/core/styles/app_styles.dart';
 
 class BudgetScreen extends ConsumerStatefulWidget {
   const BudgetScreen({super.key});
@@ -61,10 +64,10 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Définir un budget'),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           content: SingleChildScrollView(
             child: Form(
               key: _formKey,
-              // 🔥 On utilise un Consumer ici pour que le menu se rafraîchisse au premier clic
               child: Consumer(
                 builder: (context, ref, child) {
                   final categoryAsync = ref.watch(expenseCategoryListProvider);
@@ -74,7 +77,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           DropdownButtonFormField<Category>(
-                            decoration: const InputDecoration(labelText: 'Catégorie'),
+                            decoration: AppStyles.inputDecoration('Catégorie'),
                             value: _selectedCategory,
                             items: categories.map((cat) {
                               return DropdownMenuItem(
@@ -92,7 +95,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                           const SizedBox(height: 16),
                           TextFormField(
                             controller: _amountController,
-                            decoration: const InputDecoration(labelText: 'Montant max (€)'),
+                            decoration: AppStyles.inputDecoration('Montant max (${AppConfig.currencySymbol})'), // 👈 MODIF
                             keyboardType: TextInputType.number,
                             validator: (value) {
                               if (value == null || value.isEmpty) return 'Montant requis';
@@ -113,7 +116,11 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
           ),
           actions: [
             TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Annuler')),
-            ElevatedButton(onPressed: _saveBudget, child: const Text('Enregistrer')),
+            ElevatedButton(
+              onPressed: _saveBudget,
+              style: AppStyles.primaryButton,
+              child: const Text('Enregistrer'),
+            ),
           ],
         );
       },
@@ -128,6 +135,17 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Budgets'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        elevation: 0,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -159,47 +177,54 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                     ),
                   );
 
-                  return Card(
-                    elevation: 2,
+                  return Container(
                     margin: const EdgeInsets.only(bottom: 12),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            category.name,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
-                          const SizedBox(height: 8),
-                          // 🔥 On ajoute un petit contrôle pour éviter les erreurs de division par 0
-                          LinearProgressIndicator(
-                            value: budget.amount > 0 ? (budget.spent / budget.amount).clamp(0, 1) : 0,
-                            backgroundColor: Colors.grey.shade200,
-                            color: budget.isOverBudget
-                                ? Colors.red
-                                : (budget.isNearLimit ? Colors.orange : Colors.green),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${budget.spent.toStringAsFixed(2)}€ / ${budget.amount.toStringAsFixed(2)}€',
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          category.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: budget.amount > 0 ? (budget.spent / budget.amount).clamp(0, 1) : 0,
+                          backgroundColor: Colors.grey.shade200,
+                          color: budget.isOverBudget
+                              ? Colors.red
+                              : (budget.isNearLimit ? Colors.orange : Colors.green),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${budget.spent.toStringAsFixed(2)}${AppConfig.currencySymbol} / ${budget.amount.toStringAsFixed(2)}${AppConfig.currencySymbol}', // 👈 MODIF
+                            ),
+                            Text(
+                              '${budget.remaining.toStringAsFixed(2)}${AppConfig.currencySymbol} restants', // 👈 MODIF
+                              style: TextStyle(
+                                color: budget.isOverBudget
+                                    ? Colors.red
+                                    : (budget.isNearLimit ? Colors.orange : Colors.green),
+                                fontWeight: FontWeight.bold,
                               ),
-                              Text(
-                                '${budget.remaining.toStringAsFixed(2)}€ restants',
-                                style: TextStyle(
-                                  color: budget.isOverBudget
-                                      ? Colors.red
-                                      : (budget.isNearLimit ? Colors.orange : Colors.green),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   );
                 },

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:projet_track_expense/domain/entities/category.dart';
 import 'package:projet_track_expense/presentation/providers/category_provider.dart';
 import 'package:projet_track_expense/core/constants/app_colors.dart';
+// import 'package:projet_track_expense/core/constants/app_config.dart'; // 👈 AJOUT
+import 'package:projet_track_expense/core/styles/app_styles.dart';
 // import 'package:projet_track_expense/data/repositories/impl/category_repository_impl.dart';
 import 'package:projet_track_expense/presentation/providers/repository_providers.dart';
 
@@ -14,7 +16,6 @@ class CategoryManagementScreen extends ConsumerStatefulWidget {
 }
 
 class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScreen> {
-  // Pour l'ajout de catégorie
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   String _selectedIcon = 'Icons.category';
@@ -41,13 +42,12 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
         final repo = ref.read(categoryRepositoryProvider);
         await repo.addCategory(newCategory);
         
-        // Forcer le rechargement de la liste
         ref.invalidate(categoryListProvider);
         ref.invalidate(expenseCategoryListProvider);
         ref.invalidate(incomeCategoryListProvider);
 
         if (mounted) {
-          Navigator.of(context).pop(); // Fermer le dialogue
+          Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Catégorie ajoutée avec succès !')),
           );
@@ -68,16 +68,16 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
       builder: (context) {
         return AlertDialog(
           title: const Text('Nouvelle catégorie'),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           content: SingleChildScrollView(
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Nom
                   TextFormField(
                     controller: _nameController,
-                    decoration: const InputDecoration(labelText: 'Nom de la catégorie'),
+                    decoration: AppStyles.inputDecoration('Nom de la catégorie'),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Le nom est obligatoire';
@@ -86,10 +86,9 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
                     },
                   ),
                   const SizedBox(height: 16),
-                  // Type
                   DropdownButtonFormField<CategoryType>(
                     value: _selectedType,
-                    decoration: const InputDecoration(labelText: 'Type'),
+                    decoration: AppStyles.inputDecoration('Type'),
                     items: CategoryType.values.map((type) {
                       return DropdownMenuItem(
                         value: type,
@@ -113,7 +112,7 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
             ),
             ElevatedButton(
               onPressed: _addCategory,
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              style: AppStyles.primaryButton,
               child: const Text('Ajouter'),
             ),
           ],
@@ -129,6 +128,17 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gestion des catégories'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        elevation: 0,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -161,10 +171,22 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
   }
 
   Widget _buildCategoryTile(Category cat) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 8),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: ListTile(
+        contentPadding: EdgeInsets.zero,
         leading: CircleAvatar(
           backgroundColor: Color(int.parse(cat.color.substring(1), radix: 16) + 0xFF000000),
           child: Icon(
@@ -179,12 +201,12 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
             : IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red),
                 onPressed: () async {
-                  // Demander confirmation
                   final confirm = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(
                       title: const Text('Supprimer ?'),
                       content: Text('Voulez-vous supprimer la catégorie "${cat.name}" ?'),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       actions: [
                         TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Annuler')),
                         TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Oui', style: TextStyle(color: Colors.red))),
