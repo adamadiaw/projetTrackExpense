@@ -161,13 +161,14 @@ class AppDatabase {
     return await db.insert('budgets', data);
   }
 
-  Future<int> updateBudgetSpent(int budgetId, double newSpent) async {
+  // 🔥 NOUVELLE MÉTHODE AJOUTÉE POUR METTRE À JOUR LE SPENT
+  Future<void> updateBudgetSpentByCategory(int categoryId, double newTotalSpent) async {
     final db = await database;
-    return await db.update(
-      'budgets', 
-      {'spent': newSpent}, 
-      where: 'id = ?', 
-      whereArgs: [budgetId]
+    await db.update(
+      'budgets',
+      {'spent': newTotalSpent},
+      where: 'categoryId = ?',
+      whereArgs: [categoryId],
     );
   }
 }

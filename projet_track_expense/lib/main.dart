@@ -1,42 +1,34 @@
 import 'package:flutter/material.dart';
-import 'core/themes/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:projet_track_expense/core/constants/app_colors.dart';
+import 'package:projet_track_expense/core/themes/app_theme.dart';
+import 'package:projet_track_expense/presentation/screens/splash_screen.dart';
+import 'package:projet_track_expense/presentation/providers/theme_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+
     return MaterialApp(
       title: 'ProjetTrackExpense',
+      debugShowCheckedModeBanner: false,
+      
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      home: const HomeScreen(),
-    );
-  }
-}
+      themeMode: themeMode,
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ProjetTrackExpense'),
-      ),
-      body: Center(
-        child: Text(
-          'Bienvenue !',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-          ),
-        ),
-      ),
+      home: const SplashScreen(),
     );
   }
 }

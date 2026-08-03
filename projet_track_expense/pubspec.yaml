@@ -19,10 +19,10 @@ dependencies:
   intl: ^0.20.2
   flutter_local_notifications: ^20.1.0
   local_auth: ^2.3.0
-  fl_chart: ^1.1.0
   syncfusion_flutter_charts: ^31.1.19
   sqflite: ^2.4.2
   path: ^1.9.1
+  fl_chart: 0.66.0
 
 dev_dependencies:
   flutter_test:
