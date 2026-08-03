@@ -12,7 +12,7 @@
 - **Thème** : Mode clair et mode sombre (bascule rapide via l'AppBar).
 - **Monnaie** : Adaptée au FCFA (facilement modifiable).
 
-## 🛠 Technologies utilisées
+## Technologies utilisées
 
 | Technologie | Rôle |
 | :--- | :--- |
