@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:projet_track_expense/core/constants/app_colors.dart';
-import 'package:projet_track_expense/core/constants/app_config.dart'; // <--- AJOUT ICI
+import 'package:projet_track_expense/core/constants/app_config.dart';
 import 'package:projet_track_expense/domain/entities/transaction.dart';
 import 'package:projet_track_expense/presentation/providers/theme_provider.dart';
 import 'package:projet_track_expense/presentation/screens/add_transaction_screen.dart';
@@ -23,9 +23,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final transactionAsync = ref.watch(transactionListProvider);
+    // ignore: unused_local_variable
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -109,14 +111,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.brightness_6, color: AppColors.primary),
-              title: const Text('Changer le thème'),
-              onTap: () {
-                ref.read(themeProvider.notifier).toggleTheme();
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Déconnexion', style: TextStyle(color: Colors.red)),
               onTap: () => Navigator.pop(context),
@@ -137,6 +131,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
         elevation: 0,
         foregroundColor: Colors.white,
+        actions: [
+          Consumer(
+            builder: (context, ref, child) {
+              final themeMode = ref.watch(themeProvider);
+              // L'icône change selon le mode
+              final icon = themeMode == ThemeMode.dark 
+                  ? Icons.wb_sunny_outlined 
+                  : Icons.nightlight_round;
+              
+              return IconButton(
+                icon: Icon(icon),
+                onPressed: () {
+                  ref.read(themeProvider.notifier).toggleTheme();
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -212,7 +224,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Widget _buildBalanceCard(BuildContext context, List<Transaction> transactions) {
     final balance = _calculateBalance(transactions);
-    // ✅ ICI : Remplacement de '€' par AppConfig.currencySymbol
     final formatter = NumberFormat.currency(locale: 'fr_FR', symbol: AppConfig.currencySymbol, decimalDigits: 2);
     
     return Container(
@@ -264,23 +275,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Row(
       children: [
         Expanded(
-          child: _buildStatCard(
-            context,
-            title: 'Dépenses',
-            amount: formatter.format(expenses),
-            color: Colors.red,
-            icon: Icons.arrow_downward,
-          ),
+          child: _buildStatCard(context, title: 'Dépenses', amount: formatter.format(expenses), color: Colors.red, icon: Icons.arrow_downward),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _buildStatCard(
-            context,
-            title: 'Revenus',
-            amount: formatter.format(income),
-            color: Colors.green,
-            icon: Icons.arrow_upward,
-          ),
+          child: _buildStatCard(context, title: 'Revenus', amount: formatter.format(income), color: Colors.green, icon: Icons.arrow_upward),
         ),
       ],
     );
@@ -297,14 +296,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildStatCard(BuildContext context, {required String title, required String amount, required Color color, required IconData icon}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
-        ],
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,10 +334,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 5)),
+          BoxShadow(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.transparent
+                : Colors.black.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
         ],
       ),
       child: Column(
@@ -362,7 +375,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   return PieChartSectionData(
                     color: color,
                     value: entry.value,
-                    // ✅ ICI : Remplacement du '€' par FCFA sur le graphique
                     title: '${entry.value.toStringAsFixed(0)} ${AppConfig.currencySymbol}',
                     radius: 50,
                     titleStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
@@ -398,17 +410,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget _buildTransactionItem(BuildContext context, Transaction t) {
     final color = t.type == TransactionType.expense ? Colors.red : Colors.green;
     final sign = t.type == TransactionType.expense ? '-' : '+';
-    // ✅ ICI : Remplacement de '€' par AppConfig.currencySymbol
     final formatter = NumberFormat.currency(locale: 'fr_FR', symbol: AppConfig.currencySymbol, decimalDigits: 2);
     
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 3)),
+          BoxShadow(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.transparent
+                : Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
         ],
       ),
       child: ListTile(

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:projet_track_expense/domain/entities/category.dart';
 import 'package:projet_track_expense/presentation/providers/category_provider.dart';
 import 'package:projet_track_expense/core/constants/app_colors.dart';
-// import 'package:projet_track_expense/core/constants/app_config.dart'; // 👈 AJOUT
+// import 'package:projet_track_expense/core/constants/app_config.dart';
 import 'package:projet_track_expense/core/styles/app_styles.dart';
 // import 'package:projet_track_expense/data/repositories/impl/category_repository_impl.dart';
 import 'package:projet_track_expense/presentation/providers/repository_providers.dart';
@@ -77,7 +77,7 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
                 children: [
                   TextFormField(
                     controller: _nameController,
-                    decoration: AppStyles.inputDecoration('Nom de la catégorie'),
+                    decoration: AppStyles.inputDecoration(context, 'Nom de la catégorie'), // 👈 Passage du context
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Le nom est obligatoire';
@@ -88,7 +88,7 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
                   const SizedBox(height: 16),
                   DropdownButtonFormField<CategoryType>(
                     value: _selectedType,
-                    decoration: AppStyles.inputDecoration('Type'),
+                    decoration: AppStyles.inputDecoration(context, 'Type'), // 👈 Passage du context
                     items: CategoryType.values.map((type) {
                       return DropdownMenuItem(
                         value: type,
@@ -171,19 +171,23 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
   }
 
   Widget _buildCategoryTile(Category cat) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: ListTile(
         contentPadding: EdgeInsets.zero,

@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:projet_track_expense/domain/entities/transaction.dart';
 import 'package:projet_track_expense/presentation/providers/transaction_provider.dart';
 import 'package:projet_track_expense/core/constants/app_colors.dart';
-import 'package:projet_track_expense/core/constants/app_config.dart'; // 👈 AJOUT
-// import 'package:projet_track_expense/core/styles/app_styles.dart';
+import 'package:projet_track_expense/core/constants/app_config.dart';
+// ignore: unused_import
+import 'package:projet_track_expense/core/styles/app_styles.dart';
 import 'package:intl/intl.dart';
 
 class TransactionListScreen extends ConsumerWidget {
@@ -13,6 +14,7 @@ class TransactionListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionAsync = ref.watch(transactionListProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -42,20 +44,22 @@ class TransactionListScreen extends ConsumerWidget {
               final t = transactions[index];
               final color = t.type == TransactionType.expense ? Colors.red : Colors.green;
               final sign = t.type == TransactionType.expense ? '-' : '+';
-              final formatter = NumberFormat.currency(locale: 'fr_FR', symbol: AppConfig.currencySymbol, decimalDigits: 2); // 👈 MODIF
+              final formatter = NumberFormat.currency(locale: 'fr_FR', symbol: AppConfig.currencySymbol, decimalDigits: 2);
               
               return Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  boxShadow: isDark
+                      ? []
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                 ),
                 child: ListTile(
                   contentPadding: EdgeInsets.zero,

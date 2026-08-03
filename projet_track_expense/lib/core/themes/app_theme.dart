@@ -31,15 +31,20 @@ class AppTheme {
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
     ),
+    scaffoldBackgroundColor: AppColors.background,
   );
 
+  // ==========================================
+  // THÈME SOMBRE (Construit en harmonie avec le tien)
+  // ==========================================
   static ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
     colorScheme: const ColorScheme.dark(
       primary: AppColors.primary,
       onPrimary: Colors.white,
       secondary: Colors.white,
       onSecondary: Colors.white,
-      surface: AppColors.darkSurface,
+      surface: AppColors.darkBackground,
       onSurface: AppColors.darkTextPrimary,
       error: AppColors.danger,
       onError: Colors.white,
@@ -62,5 +67,6 @@ class AppTheme {
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
     ),
+    scaffoldBackgroundColor: AppColors.darkBackground,
   );
 }
